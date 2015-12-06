@@ -21,28 +21,65 @@
  */
      
 // Put your libraries here (#include ...)
-#include <WaspBLE.h>
+// Include WIFI library 
+#include <WaspWIFI.h>
+int counter = 0;
+int wifi_result = 0;
+//WiFi sockets
+uint8_t socket=SOCKET0;
+uint8_t socket1=SOCKET1;
+
+void switchWifi() {
+    if( WIFI.ON(socket) == 1 ) {    
+      USB.println(F("WiFi switched ON on socket 0"));
+      wifi_result = 1;
+    }else if(WIFI.ON(socket1) == 1) {
+      USB.println(F("WiFi switched ON on socket 1"));
+      wifi_result = 1;
+    }else{
+      USB.println(F("WiFi is off. Secure connections if they seems to be present")); 
+    }
+}
+
+void wifiInfo() {
+   if (wifi_result == 1) {
+    // Displays connection status.  
+    USB.println(F("\nFirmware Version:"));
+    WIFI.getVersion();
+   
+    USB.println(F("Connection Info:"));
+    WIFI.getConnectionInfo();
+   }  else {
+    USB.println(F("Wifi is not ON, there is no status to check")); 
+   }
+}
 void setup() {
     // put your setup code here, to run once:
     // Open the USB connection
     USB.ON();
-    USB.print("Ejemplo test");
+    USB.print("Test number 1\n");
+    switchWifi();
+    if(wifi_result == 1){
+      USB.println(F("Resetting WiFI to Default values..."));
+      WIFI.resetValues();
+    }  
+    USB.println(F("Setup done"));
+    
     
 }
 
 
 void loop() {
-    // put your main code here, to run repeatedly:
-    
-    //Bateria
-  USB.print(F("Nivel de bateria actual: "));
+  wifiInfo();
+  
+  USB.print(F("Battery: "));
   USB.print((PWR.getBatteryLevel(),DEC));
   USB.print(F(" %"));
   
-  //Memoria libre
-  USB.print(F("\nMemoria libre:"));
-  USB.println(freeMemory());
-  
+
+  USB.print(F("\nFree memory: "));
+  USB.print(freeMemory());
+  USB.print(F(" %\n"));  
   
   
   delay(5000);
